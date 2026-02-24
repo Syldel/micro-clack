@@ -2,8 +2,16 @@
   "name": "@syldel/micro-clack",
   "version": "0.1.2",
   "description": "Minimal interactive CLI prompts, zero dependencies",
+  "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Syldel/micro-clack.git"

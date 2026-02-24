@@ -15,8 +15,7 @@ Provides text input, confirm prompts, select menus with scroll, and spinner with
 ## 🛠 Usage
 
 ```ts
-import { promptText, promptConfirm, promptSelect } from '@syldel/micro-clack';
-import { Spinner } from '@syldel/micro-clack/core/spinner';
+import { promptText, promptConfirm, promptSelect, Spinner } from '@syldel/micro-clack';
 
 (async () => {
   const name = await promptText('Enter your name');
