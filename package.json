@@ -16,7 +16,6 @@
     "dist"
   ],
   "scripts": {
-    "prepare": "npm run build",
     "start": "ts-node --files scripts/demo.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
