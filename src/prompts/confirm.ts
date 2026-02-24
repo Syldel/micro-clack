@@ -1,4 +1,4 @@
-import { listenKeys, stopListening } from '../inputs';
+import { listenKeys, stopListening } from '../core/inputs';
 
 export function promptConfirm(message: string): Promise<boolean> {
   return new Promise((resolve) => {

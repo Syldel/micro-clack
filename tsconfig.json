@@ -6,10 +6,17 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
-    "outDir": "dist"
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true,
+    "skipLibCheck": true
   },
   "include": [
-    "src",
-    "scripts"
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "scripts",
+    "dist"
   ]
 }

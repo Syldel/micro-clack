@@ -1,4 +1,4 @@
-import { listenKeys, stopListening } from '../inputs';
+import { listenKeys, stopListening } from '../core/inputs';
 
 export function promptText(message: string): Promise<string> {
   return new Promise((resolve) => {

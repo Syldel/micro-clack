@@ -1,6 +1,6 @@
-import { listenKeys, stopListening } from '../inputs';
-import { clear, log } from '../render';
-import { colors } from '../colors';
+import { listenKeys, stopListening } from '../core/inputs';
+import { clear, log } from '../core/render';
+import { colors } from '../core/colors';
 
 export async function promptSelect(
   message: string,

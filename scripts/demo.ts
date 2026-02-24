@@ -1,6 +1,4 @@
-import { promptConfirm, promptSelect, promptText } from '../src/core';
-import { colors } from '../src/core/colors';
-import { Spinner } from '../src/core/spinner';
+import { promptText, promptConfirm, promptSelect, Spinner, colors } from '../src';
 
 (async () => {
   const line = Object.keys(colors)
