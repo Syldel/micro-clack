@@ -7,7 +7,7 @@ export class Spinner {
 
   /** Démarre le spinner avec un message initial */
   start(msg: string) {
-    process.stdout.write(colors.bright + msg + colors.reset + ' ');
+    process.stdout.write(colors.brightText(msg) + ' ');
 
     this.interval = setInterval(() => {
       process.stdout.write('\b' + this.frames[this.i]);

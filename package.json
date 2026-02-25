@@ -24,7 +24,9 @@
     "dist"
   ],
   "scripts": {
-    "start": "ts-node --files scripts/demo.ts",
+    "start": "npm run demo",
+    "demo": "ts-node --files scripts/demo.ts",
+    "colors": "ts-node --files scripts/colors.ts",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "clean": "rm -rf dist",

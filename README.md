@@ -18,21 +18,31 @@ Provides text input, confirm prompts, select menus with scroll, and spinner with
 import { promptText, promptConfirm, promptSelect, Spinner } from '@syldel/micro-clack';
 
 (async () => {
+  // Text
   const name = await promptText('Enter your name', {
-    trim: true,
     validate: (value) => value.length > 0 || 'Name cannot be empty'
   });
 
+  // Confirm
   const proceed = await promptConfirm('Do you want to continue?');
   if (!proceed) process.exit();
 
-  const color = await promptSelect('Pick a color', ['Red','Green','Blue','Yellow','Magenta','Cyan','Black'], 4);
-  console.log('You selected:', color, 'Name:', name);
+  // Select
+  const fruits = await promptSelect<{ id: number; code: string }>('Select a fruit', [
+    { label: 'Apple', value: { id: 1, code: 'APL' } },
+    { label: 'Banana', value: { id: 2, code: 'BNA' } },
+    { label: 'Cherry', value: { id: 3, code: 'CHR' } },
+  ]);
 
+  // Spinner
   const spinner = new Spinner();
   spinner.start('Processing');
   await new Promise(r => setTimeout(r, 2000));
   spinner.stop('Done!');
+
+  // Colors
+  console.log(colors.redText('❌ Error: Something went wrong!'));
+  console.log(colors.color('Hello World', colors.code.blue));
 })();
 ```
 

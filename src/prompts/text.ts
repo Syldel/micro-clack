@@ -1,3 +1,4 @@
+import { colors } from '../core';
 import { listenKeys, stopListening } from '../core/inputs';
 
 /**
@@ -13,7 +14,7 @@ export interface PromptTextOptions {
  * Displays an interactive text prompt in the terminal.
  * @example
  * const name = await promptText('Enter your name', {
- *   trim: true,
+ *   trim: false,
  *   validate: (value) => value.length > 0 || 'Name cannot be empty'
  * });
  */
@@ -21,23 +22,23 @@ export async function promptText(message: string, options?: PromptTextOptions): 
   while (true) {
     const value = await internalPrompt(message);
 
-    let finalValue = options?.trim ? value.trim() : value;
+    const finalValue = (options?.trim ?? true) ? value.trim() : value;
 
-    if (options?.transform) {
-      finalValue = options.transform(finalValue);
-    }
+    const transformed = options?.transform ? options.transform(finalValue) : finalValue;
 
     if (!options?.validate) {
-      return finalValue;
+      return transformed;
     }
 
-    const result = options.validate(finalValue);
+    const result = options.validate(transformed);
 
     if (result === true) {
-      return finalValue;
+      return transformed;
     }
 
-    process.stdout.write(`\n❌ ${typeof result === 'string' ? result : 'Invalid input.'}\n\n`);
+    process.stdout.write(
+      `\n${colors.redText('❌')} ${typeof result === 'string' ? colors.redText(result) : colors.redText('Invalid input.')}\n\n`,
+    );
   }
 }
 
