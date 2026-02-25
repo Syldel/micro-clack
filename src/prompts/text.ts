@@ -1,6 +1,47 @@
 import { listenKeys, stopListening } from '../core/inputs';
 
-export function promptText(message: string): Promise<string> {
+/**
+ * Options for the promptText function.
+ */
+export interface PromptTextOptions {
+  validate?: (value: string) => boolean | string;
+  transform?: (value: string) => string;
+  trim?: boolean;
+}
+
+/**
+ * Displays an interactive text prompt in the terminal.
+ * @example
+ * const name = await promptText('Enter your name', {
+ *   trim: true,
+ *   validate: (value) => value.length > 0 || 'Name cannot be empty'
+ * });
+ */
+export async function promptText(message: string, options?: PromptTextOptions): Promise<string> {
+  while (true) {
+    const value = await internalPrompt(message);
+
+    let finalValue = options?.trim ? value.trim() : value;
+
+    if (options?.transform) {
+      finalValue = options.transform(finalValue);
+    }
+
+    if (!options?.validate) {
+      return finalValue;
+    }
+
+    const result = options.validate(finalValue);
+
+    if (result === true) {
+      return finalValue;
+    }
+
+    process.stdout.write(`\n❌ ${typeof result === 'string' ? result : 'Invalid input.'}\n\n`);
+  }
+}
+
+function internalPrompt(message: string): Promise<string> {
   return new Promise((resolve) => {
     let input = '';
     process.stdout.write(message + ': ');

@@ -18,7 +18,10 @@ Provides text input, confirm prompts, select menus with scroll, and spinner with
 import { promptText, promptConfirm, promptSelect, Spinner } from '@syldel/micro-clack';
 
 (async () => {
-  const name = await promptText('Enter your name');
+  const name = await promptText('Enter your name', {
+    trim: true,
+    validate: (value) => value.length > 0 || 'Name cannot be empty'
+  });
 
   const proceed = await promptConfirm('Do you want to continue?');
   if (!proceed) process.exit();
