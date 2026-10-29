@@ -10,6 +10,17 @@ import { promptText, promptConfirm, promptSelect, Spinner } from '../src';
   });
   console.log('Name:', name);
 
+  // Masked: only '*' is echoed. Try Backspace, arrows (ignored) and a wrong value:
+  // the rejection message must not show what was typed. The value itself is
+  // never printed, only its length.
+  const SECRET_REGEX = /^0x[a-fA-F0-9]{8}$/;
+  const secret = await promptText('Enter a secret (0x + 8 hex)', {
+    mask: true,
+    validate: (value) =>
+      SECRET_REGEX.test(value) || 'Secret must be 0x followed by 8 hex characters.',
+  });
+  console.log(`Secret accepted (${secret.length} characters, not shown)`);
+
   const proceed = await promptConfirm('Do you want to continue?');
   if (!proceed) process.exit();
 

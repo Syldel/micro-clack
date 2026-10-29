@@ -15,7 +15,11 @@ export class Spinner {
       this.stop();
       process.stdout.write('\n');
     }
-    process.stdout.write(colors.brightText(msg) + ' ');
+    // Le premier symbole se dessine tout de suite, après l'espace : chaque tour
+    // recule ensuite sur lui seul. Avant, le premier tour reculait sur l'espace
+    // et le message final se collait au libellé (« ProcessingDone! »).
+    process.stdout.write(colors.brightText(msg) + ' ' + this.frames[0]);
+    this.i = 1;
 
     this.interval = setInterval(() => {
       process.stdout.write('\b' + this.frames[this.i]);
@@ -29,7 +33,7 @@ export class Spinner {
     clearInterval(this.interval);
     this.interval = undefined;
     this.i = 0;
-    process.stdout.write('\b'); // supprime le dernier caractère du spinner
+    process.stdout.write('\b \b'); // efface le symbole et laisse l'espace
     if (finalMsg) process.stdout.write(finalMsg + '\n');
   }
 }
