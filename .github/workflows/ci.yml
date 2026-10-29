@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Même version de Node qu'en local : .nvmrc fait foi, pas un numéro recopié ici.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
+      # Le build est le seul contrôle qui produit ce qui sera publié : un
+      # changement de config TypeScript peut passer lint et tests et le casser.
+      - name: Build
+        run: npm run build
+
+      # Le paquet publié ne doit contenir ni specs ni doubles de test.
+      - name: Check package contents
+        run: |
+          npm pack --dry-run --json > pack.json
+          node -e "const f=require('./pack.json')[0].files.map(x=>x.path);const bad=f.filter(p=>/\.spec\.|testing\//.test(p));if(bad.length){console.error('Unexpected files in package:',bad);process.exit(1)}console.log(f.length+' files, none from tests')"
