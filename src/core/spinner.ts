@@ -5,8 +5,16 @@ export class Spinner {
   private i = 0;
   private interval?: ReturnType<typeof setInterval>;
 
-  /** Démarre le spinner avec un message initial */
+  /**
+   * Démarre le spinner avec un message initial. S'il tournait déjà, sa ligne
+   * est close d'abord : écraser la référence laissait l'ancien intervalle
+   * dessiner sans fin et garder le processus en vie.
+   */
   start(msg: string) {
+    if (this.interval) {
+      this.stop();
+      process.stdout.write('\n');
+    }
     process.stdout.write(colors.brightText(msg) + ' ');
 
     this.interval = setInterval(() => {
@@ -15,9 +23,12 @@ export class Spinner {
     }, 100);
   }
 
-  /** Arrête le spinner et affiche un message final facultatif */
+  /** Arrête le spinner et affiche un message final facultatif ; sans effet s'il ne tourne pas */
   stop(finalMsg?: string) {
-    if (this.interval) clearInterval(this.interval);
+    if (!this.interval) return;
+    clearInterval(this.interval);
+    this.interval = undefined;
+    this.i = 0;
     process.stdout.write('\b'); // supprime le dernier caractère du spinner
     if (finalMsg) process.stdout.write(finalMsg + '\n');
   }
