@@ -1,4 +1,4 @@
-import { listenKeys, stopListening } from '../core/inputs';
+import { assertInteractive, exitOnInterrupt, listenKeys, stopListening } from '../core/inputs';
 import { clear, log } from '../core/render';
 import { colors } from '../core/colors';
 
@@ -28,6 +28,12 @@ export async function promptSelect<T>(
   options: { label: string; value: T }[],
   pageSize = 5,
 ): Promise<T> {
+  // Both checks run before render() clears the screen.
+  if (options.length === 0) {
+    throw new Error('micro-clack: promptSelect needs at least one option.');
+  }
+  assertInteractive();
+
   let selected = 0;
   let offset = 0;
 
@@ -53,7 +59,7 @@ export async function promptSelect<T>(
 
   return new Promise<T>((resolve) => {
     listenKeys((key) => {
-      if (key === '\u0003') process.exit(); // Ctrl+C
+      if (key === '\u0003') exitOnInterrupt();
       if (key === '\u001B[A') selected = (selected - 1 + options.length) % options.length; // Up
       if (key === '\u001B[B') selected = (selected + 1) % options.length; // Down
 

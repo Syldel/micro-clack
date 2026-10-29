@@ -1,4 +1,4 @@
-import { listenKeys, stopListening } from '../core/inputs';
+import { assertInteractive, exitOnInterrupt, listenKeys, stopListening } from '../core/inputs';
 
 /**
  * Displays a yes/no confirmation prompt in the terminal.
@@ -20,6 +20,8 @@ import { listenKeys, stopListening } from '../core/inputs';
  */
 export function promptConfirm(message: string, defaultValue: boolean = false): Promise<boolean> {
   return new Promise((resolve) => {
+    // Before writing anything: a thrown error here rejects the promise.
+    assertInteractive();
     const promptText = `${message} (y/n)${defaultValue ? ' [Y]' : ' [N]'}: `;
 
     const showPrompt = () => process.stdout.write(promptText);
@@ -39,9 +41,7 @@ export function promptConfirm(message: string, defaultValue: boolean = false): P
         process.stdout.write((defaultValue ? 'y' : 'n') + '\n');
         resolve(defaultValue);
       } else if (key === '\u0003') {
-        // Ctrl+C
-        stopListening();
-        process.exit();
+        exitOnInterrupt();
       } else {
         // invalid key, re-show prompt
         process.stdout.write('\n');

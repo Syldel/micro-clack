@@ -12,6 +12,16 @@ Provides text input, confirm prompts, select menus with scroll, and spinner with
 - Pure TypeScript, zero dependencies  
 - Works on Node 18+ and TypeScript 5+  
 
+## ⚠️ Behaviour to know
+
+- Prompts need an interactive terminal: without a TTY on stdin (piped input, CI),
+  they reject with an explicit error before writing anything.
+- Ctrl+C restores the terminal and exits with code **130** (SIGINT convention),
+  never 0: an interrupted script does not look successful.
+- `promptText` has no cursor editing: arrow, Home or Delete keys are ignored
+  rather than inserted into the value. Backspace (DEL or Ctrl+H) works.
+- `promptSelect` rejects an empty option list.
+
 ## 🛠 Usage
 
 ```ts

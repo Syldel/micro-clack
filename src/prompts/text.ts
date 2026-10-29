@@ -1,5 +1,5 @@
 import { colors } from '../core';
-import { listenKeys, stopListening } from '../core/inputs';
+import { assertInteractive, exitOnInterrupt, listenKeys, stopListening } from '../core/inputs';
 
 /**
  * Options for the promptText function.
@@ -25,6 +25,7 @@ export interface PromptTextOptions {
  * });
  */
 export async function promptText(message: string, options?: PromptTextOptions): Promise<string> {
+  assertInteractive();
   while (true) {
     const value = await internalPrompt(message, options?.mask);
 
@@ -64,9 +65,10 @@ function internalPrompt(message: string, mask?: boolean | string): Promise<strin
         process.stdout.write('\n');
         resolve(input);
       } else if (key === '\u0003') {
-        // Ctrl+C
-        stopListening();
-        process.exit();
+        exitOnInterrupt();
+      } else if (key.startsWith('\u001B')) {
+        // Arrows, Home, Delete… arrive as escape sequences: appended, they
+        // corrupted the value with invisible characters. No cursor editing here.
       } else if (key === '\u007F' || key === '\b') {
         // Backspace: DEL on most terminals, Ctrl+H on some Windows consoles
         if (input.length > 0 && echo('x') !== '') process.stdout.write('\b \b');
