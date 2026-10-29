@@ -1,0 +1,10 @@
+# Fins de ligne : LF partout, y compris dans la copie de travail Windows.
+#
+# La règle vit ici et non dans `core.autocrlf` : Git pour Windows règle
+# `core.autocrlf=true` au niveau système, ce qui sortait 23 fichiers sur 25 en
+# CRLF alors que l'index est en LF. Une config de machine n'existe pas sur
+# l'autre poste ni sur une CI ; ce fichier survit à un clone neuf.
+* text=auto eol=lf
+
+# Prettier écrit en LF (`.prettierrc` : `endOfLine: 'lf'`). Sans la ligne
+# ci-dessus, git recocherait les mêmes fichiers en CRLF derrière lui.
