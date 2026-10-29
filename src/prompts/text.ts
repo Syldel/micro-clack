@@ -8,6 +8,12 @@ export interface PromptTextOptions {
   validate?: (value: string) => boolean | string;
   transform?: (value: string) => string;
   trim?: boolean;
+  /**
+   * Hides the typed value: `true` echoes `*` per character, a one-character
+   * string echoes that character instead, and `''` echoes nothing at all.
+   * Use it for secrets.
+   */
+  mask?: boolean | string;
 }
 
 /**
@@ -20,7 +26,7 @@ export interface PromptTextOptions {
  */
 export async function promptText(message: string, options?: PromptTextOptions): Promise<string> {
   while (true) {
-    const value = await internalPrompt(message);
+    const value = await internalPrompt(message, options?.mask);
 
     const finalValue = (options?.trim ?? true) ? value.trim() : value;
 
@@ -42,7 +48,12 @@ export async function promptText(message: string, options?: PromptTextOptions): 
   }
 }
 
-function internalPrompt(message: string): Promise<string> {
+function internalPrompt(message: string, mask?: boolean | string): Promise<string> {
+  const maskChar = mask === true ? '*' : mask;
+  // A pasted value arrives as one chunk: echo one mask character per character.
+  const echo = (key: string) =>
+    maskChar === undefined || maskChar === false ? key : maskChar.repeat([...key].length);
+
   return new Promise((resolve) => {
     let input = '';
     process.stdout.write(message + ': ');
@@ -56,13 +67,13 @@ function internalPrompt(message: string): Promise<string> {
         // Ctrl+C
         stopListening();
         process.exit();
-      } else if (key === '\u007F') {
-        // Backspace
+      } else if (key === '\u007F' || key === '\b') {
+        // Backspace: DEL on most terminals, Ctrl+H on some Windows consoles
+        if (input.length > 0 && echo('x') !== '') process.stdout.write('\b \b');
         input = input.slice(0, -1);
-        process.stdout.write('\b \b');
       } else {
         input += key;
-        process.stdout.write(key);
+        process.stdout.write(echo(key));
       }
     });
   });

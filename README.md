@@ -5,7 +5,7 @@ Provides text input, confirm prompts, select menus with scroll, and spinner with
 
 ## 🚀 Features
 
-- Text input (`promptText`)  
+- Text input (`promptText`), maskable for secrets  
 - Yes/No confirm (`promptConfirm`)  
 - Select menu with scroll (`promptSelect`)  
 - Spinner with ANSI colors (`Spinner`)  
@@ -22,6 +22,9 @@ import { promptText, promptConfirm, promptSelect, Spinner } from '@syldel/micro-
   const name = await promptText('Enter your name', {
     validate: (value) => value.length > 0 || 'Name cannot be empty'
   });
+
+  // Secret: `mask: true` echoes `*`, `mask: ''` echoes nothing
+  const token = await promptText('Enter your token', { mask: true });
 
   // Confirm
   const proceed = await promptConfirm('Do you want to continue?');
