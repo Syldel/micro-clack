@@ -33,8 +33,7 @@
     "build": "npm run lint && npm run clean && tsc -p tsconfig.json",
     "test": "jest",
     "test:watch": "jest --watch",
-    "prepublishOnly": "npm run build",
-    "release": "npm run build && npm version patch && npm publish"
+    "prepublishOnly": "npm run build"
   },
   "publishConfig": {
     "access": "public"
