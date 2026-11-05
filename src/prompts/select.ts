@@ -2,11 +2,23 @@ import { assertInteractive, exitOnInterrupt, listenKeys, stopListening } from '.
 import { clear, log } from '../core/render';
 import { colors } from '../core/colors';
 
+// A terminal sends an arrow in one of two forms: CSI (`ESC [ A`) in normal
+// cursor mode, SS3 (`ESC O A`) in application cursor mode. Only CSI was read
+// up to 1.0.3, so in a terminal left in application mode the arrows did
+// nothing, silently (measured on Windows on 2026-11-05: "\u001bOA", "\u001bOB").
+const UP_KEYS = new Set(['\u001B[A', '\u001BOA']);
+const DOWN_KEYS = new Set(['\u001B[B', '\u001BOB']);
+
+// Digits move the selection without any escape sequence, so no terminal can
+// leave the menu stuck. They only move it: Enter still confirms.
+const MAX_NUMBERED = 9;
+
 /**
  * Interactive selection prompt with typed values.
  *
- * The user navigates the options with Up/Down arrows,
- * and presses Enter to select. Ctrl+C exits.
+ * The user moves with the Up/Down arrows or types the number shown before an
+ * option (the first nine are numbered), then presses Enter to select.
+ * Ctrl+C exits.
  *
  * @template T - Type of the option values.
  *
@@ -36,6 +48,8 @@ export async function promptSelect<T>(
 
   let selected = 0;
   let offset = 0;
+  const numbered = Math.min(options.length, MAX_NUMBERED);
+  const hint = `Up/Down or 1-${numbered}, then Enter`;
 
   function render() {
     clear();
@@ -44,8 +58,9 @@ export async function promptSelect<T>(
     const visible = options.slice(offset, offset + pageSize);
     visible.forEach((opt, i) => {
       const index = i + offset;
-      if (index === selected) log(colors.cyanText('> ' + opt.label));
-      else log('  ' + opt.label);
+      const number = index < numbered ? `${index + 1}. ` : '   ';
+      if (index === selected) log(colors.cyanText('> ' + number + opt.label));
+      else log('  ' + number + opt.label);
     });
 
     if (options.length > pageSize) {
@@ -53,6 +68,7 @@ export async function promptSelect<T>(
         `\nShowing ${offset + 1}-${Math.min(offset + pageSize, options.length)} of ${options.length}`,
       );
     }
+    log(colors.dimText(hint));
   }
 
   render();
@@ -60,8 +76,9 @@ export async function promptSelect<T>(
   return new Promise<T>((resolve) => {
     listenKeys((key) => {
       if (key === '\u0003') exitOnInterrupt();
-      if (key === '\u001B[A') selected = (selected - 1 + options.length) % options.length; // Up
-      if (key === '\u001B[B') selected = (selected + 1) % options.length; // Down
+      if (UP_KEYS.has(key)) selected = (selected - 1 + options.length) % options.length;
+      if (DOWN_KEYS.has(key)) selected = (selected + 1) % options.length;
+      if (/^[1-9]$/.test(key) && Number(key) <= numbered) selected = Number(key) - 1;
 
       if (selected < offset) offset = selected;
       if (selected >= offset + pageSize) offset = selected - pageSize + 1;

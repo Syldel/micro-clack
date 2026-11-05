@@ -21,6 +21,10 @@ Provides text input, confirm prompts, select menus with scroll, and spinner with
 - `promptText` has no cursor editing: arrow, Home or Delete keys are ignored
   rather than inserted into the value. Backspace (DEL or Ctrl+H) works.
 - `promptSelect` rejects an empty option list.
+- `promptSelect` reads the arrows in both forms terminals send (`ESC [ A` and, in
+  application cursor mode, `ESC O A`); up to 1.0.3 only the first, so the arrows did
+  nothing in some Windows terminals. Typing the number shown before an option (the
+  first nine) moves to it too, without any escape sequence; Enter always confirms.
 
 ## 🛠 Usage
 
